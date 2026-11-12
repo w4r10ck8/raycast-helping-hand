@@ -1,0 +1,97 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "helping-hand",
+  "title": "Helping Hand",
+  "description": "Transform text with saved prompts using Claude, Codex, Raycast AI, Ollama or Apple Intelligence",
+  "icon": "icon.png",
+  "author": "jay_pancholi",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "transform-text",
+      "title": "Helping Hand",
+      "keywords": [
+        "transform",
+        "text",
+        "rewrite",
+        "prompt"
+      ],
+      "description": "Pick a prompt, transform text with Claude, Codex, Raycast AI, Ollama or Apple Intelligence",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "defaultProvider",
+      "title": "Default Provider",
+      "description": "Provider selected when Helping Hand opens (falls back to the first ready one)",
+      "type": "dropdown",
+      "required": false,
+      "default": "claude",
+      "data": [
+        {
+          "title": "Claude",
+          "value": "claude"
+        },
+        {
+          "title": "Codex",
+          "value": "codex"
+        },
+        {
+          "title": "Apple Intelligence",
+          "value": "apple"
+        },
+        {
+          "title": "Raycast AI",
+          "value": "raycast"
+        },
+        {
+          "title": "Ollama (local)",
+          "value": "ollama"
+        }
+      ]
+    },
+    {
+      "name": "claudeModel",
+      "title": "Claude Model",
+      "description": "Model alias or ID passed to claude --model",
+      "type": "textfield",
+      "required": false,
+      "default": "sonnet"
+    },
+    {
+      "name": "codexModel",
+      "title": "Codex Model",
+      "description": "Model passed to codex exec -m (blank uses Codex default)",
+      "type": "textfield",
+      "required": false
+    },
+    {
+      "name": "ollamaModel",
+      "title": "Ollama Model",
+      "description": "Model passed to Ollama (pull it first with ollama pull)",
+      "type": "textfield",
+      "required": false,
+      "default": "llama3.2"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^2.11.1",
+    "@raycast/utils": "^2.3.3"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.2.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0"
+  },
+  "scripts": {
+    "build:swift": "swiftc -O swift/apple-ai.swift -o assets/apple-ai",
+    "build": "npm run build:swift && ray build -e dist",
+    "dev": "npm run build:swift && ray develop",
+    "lint": "ray lint",
+    "test": "node --experimental-strip-types --test src/lib/prompt.test.ts"
+  }
+}

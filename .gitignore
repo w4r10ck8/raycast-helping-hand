@@ -1,0 +1,4 @@
+node_modules
+assets/apple-ai
+raycast-env.d.ts
+.DS_Store
