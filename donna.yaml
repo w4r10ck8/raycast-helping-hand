@@ -1,0 +1,30 @@
+name: raycast-helping-hand
+output: MEMORY-SLOP
+usage: true
+limits:
+  context: 80
+  fiveHour: 90
+  weekly: 90
+platforms:
+  claude:
+    enabled: false
+  copilot:
+    enabled: true
+  cursor:
+    enabled: false
+  codex:
+    enabled: false
+agents:
+  - developer
+skills:
+  - typescript
+  - git
+  - testing
+  - next-best-practices
+  - form-builder
+  - form-extract
+  - form-sync
+  - make-interfaces-feel-better
+  - ponytail
+  - archify
+  - handoff
