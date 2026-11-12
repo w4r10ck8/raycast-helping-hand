@@ -131,25 +131,21 @@ export default function Command() {
     setSelectedId(prompt.id);
     setRunningId(prompt.id);
     setOutputs((current) => ({ ...current, [prompt.id]: { text: "", provider: provider.title } }));
-    const toast = await showToast({
-      style: Toast.Style.Animated,
-      title: "Converting…",
-      primaryAction: { title: "Stop", onAction: () => controller.abort() },
-    });
     try {
       const text = await provider.run(applyPrompt(prompt.prompt, input.text), {
         signal: controller.signal,
         onText: (delta) => update((output) => ({ ...output, text: output.text + delta })),
       });
       update((output) => ({ ...output, text, ms: Date.now() - started }));
-      toast.style = Toast.Style.Success;
-      toast.title = "Converted";
     } catch (error) {
       if (abortRef.current !== controller) return; // superseded by a newer conversion
       update((output) => ({ ...output, ms: Date.now() - started, stopped: controller.signal.aborted }));
-      toast.style = controller.signal.aborted ? Toast.Style.Success : Toast.Style.Failure;
-      toast.title = controller.signal.aborted ? "Stopped" : `${provider.title} failed`;
-      toast.message = controller.signal.aborted ? undefined : error instanceof Error ? error.message : String(error);
+      if (!controller.signal.aborted)
+        await showToast(
+          Toast.Style.Failure,
+          `${provider.title} failed`,
+          error instanceof Error ? error.message : String(error),
+        );
     } finally {
       if (abortRef.current === controller) setRunningId(undefined);
     }
@@ -364,7 +360,7 @@ export default function Command() {
 
   return (
     <List
-      isLoading={isLoading}
+      isLoading={isLoading || !!runningId}
       isShowingDetail={prompts.length > 0}
       searchBarPlaceholder={typing ? "Type your input…" : "Pick a prompt…"}
       filtering={!typing}
