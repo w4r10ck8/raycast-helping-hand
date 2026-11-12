@@ -89,8 +89,8 @@
   },
   "scripts": {
     "build:swift": "swiftc -O swift/apple-ai.swift -o assets/apple-ai",
-    "build": "npm run build:swift && ray build -e dist",
-    "dev": "npm run build:swift && ray develop",
+    "build": "bun run build:swift && ray build -e dist",
+    "dev": "bun run build:swift && ray develop",
     "lint": "ray lint",
     "test": "node --experimental-strip-types --test src/lib/prompt.test.ts"
   }
