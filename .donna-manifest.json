@@ -2,6 +2,7 @@
   "version": 2,
   "files": [
     ".agents/skills/archify/SKILL.md",
+    ".agents/skills/file-management/SKILL.md",
     ".agents/skills/form-builder/01-system-overview.md",
     ".agents/skills/form-builder/02-register.md",
     ".agents/skills/form-builder/03-schemas.md",
@@ -66,7 +67,8 @@
       "make-interfaces-feel-better": "1.0.0",
       "ponytail": "1.0.0",
       "archify": "1.0.0",
-      "handoff": "1.0.0"
+      "handoff": "1.0.0",
+      "file-management": "1.5.0"
     }
   }
 }

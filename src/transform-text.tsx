@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { Confirm } from "./components/Confirm";
 import { PromptForm } from "./components/PromptForm";
 import { TextForm } from "./components/TextForm";
-import { type Input, type InputSource, useCapturedInput } from "./hooks/useCapturedInput";
+import { type Input, useCapturedInput } from "./hooks/useCapturedInput";
 import { applyPrompt, mergePrompts, type SavedPrompt } from "./lib/prompt";
 import { headerImage } from "./lib/headerImage";
 import { exportPrompts, importPrompts } from "./lib/importExport";
@@ -34,16 +34,15 @@ function promptIcon({ icon, color }: SavedPrompt) {
   };
 }
 
-const SOURCES: Array<[InputSource, string]> = [
-  ["clipboard", "Clipboard ⌘⌥1"],
-  ["typed", "Typed ⌘⌥2"],
-];
-
-function detailMarkdown(prompt: SavedPrompt, input: Input, app?: string, output?: Output, running?: boolean) {
-  const inputHeader = headerImage(
-    "Input",
-    SOURCES.map(([source, label]) => ({ label, tone: source === input.source ? "active" : undefined })),
-  );
+function detailMarkdown(
+  prompt: SavedPrompt,
+  input: Input,
+  providerTitle: string,
+  app?: string,
+  output?: Output,
+  running?: boolean,
+) {
+  const inputHeader = headerImage("Input", []);
   const inputPart = input.text
     ? `${inputHeader}\n\n${input.text}\n\n_${input.text.length} characters${
         input.source === "typed" ? "" : " · captured when Raycast opened"
@@ -61,7 +60,7 @@ function detailMarkdown(prompt: SavedPrompt, input: Input, app?: string, output?
             ? { label: "Stopped" }
             : { label: `Default: Paste to ${app ?? "Active App"}`, tone: "success" },
         ])}\n\n${output.text}\n\n_${output.provider} · ${((output.ms ?? 0) / 1000).toFixed(1)} s · Edit inline with ⌘⇧E · Regenerate with ⌘R_`
-      : `${headerImage("Output", [])}\n\n_Press ↵ to convert with “${prompt.name}”._`;
+      : `${headerImage("Output", [{ label: `${providerTitle} · ⌘M` }])}\n\n_Press ↵ to convert with “${prompt.name}”._`;
   return `${inputPart}\n\n---\n\n${outputPart}`;
 }
 
@@ -200,7 +199,7 @@ export default function Command() {
       <Action
         title="Reload Input from Clipboard"
         icon={Icon.ArrowClockwise}
-        shortcut={{ modifiers: ["cmd", "shift"], key: "v" }}
+        shortcut={{ modifiers: ["cmd", "shift"], key: "r" }}
         onAction={capture}
       />
     </ActionPanel.Section>
@@ -239,7 +238,14 @@ export default function Command() {
         detail={
           <List.Item.Detail
             isLoading={running}
-            markdown={detailMarkdown(prompt, input, captured.app, outputs[prompt.id], running)}
+            markdown={detailMarkdown(
+              prompt,
+              input,
+              providers.find((provider) => provider.id === (prompt.model ?? providerId))?.title ?? providers[0].title,
+              captured.app,
+              outputs[prompt.id],
+              running,
+            )}
           />
         }
         actions={
@@ -370,22 +376,21 @@ export default function Command() {
       onSelectionChange={(id) => setSelectedId(id ?? undefined)}
       searchBarAccessory={
         <List.Dropdown
-          tooltip="Provider for this run (⌘M). A prompt can pin its own in Edit (⌘E)."
-          value={providerId}
-          onChange={setProviderId}
+          tooltip="Input source (⌘⌥1 Clipboard, ⌘⌥2 Typed). Change provider with ⌘M."
+          value={input.source}
+          onChange={(source) => {
+            // Raycast fires onChange on mount; ignore it so the input isn't reset.
+            if (source === input.source) return;
+            setInput(
+              source === "clipboard"
+                ? { text: captured.clipboard ?? "", source: "clipboard" }
+                : { text: "", source: "typed" },
+            );
+          }}
         >
-          <List.Dropdown.Section title="Provider">
-            {providers.map((provider) => {
-              const status = statuses?.[provider.id];
-              return (
-                <List.Dropdown.Item
-                  key={provider.id}
-                  value={provider.id}
-                  title={status ? `${provider.title} · ${status}` : provider.title}
-                  icon={statuses && !status ? "dot-ready.svg" : "dot-off.svg"}
-                />
-              );
-            })}
+          <List.Dropdown.Section title="Input">
+            <List.Dropdown.Item value="clipboard" title="Clipboard" icon={Icon.Clipboard} />
+            <List.Dropdown.Item value="typed" title="Typed" icon={Icon.Text} />
           </List.Dropdown.Section>
         </List.Dropdown>
       }
