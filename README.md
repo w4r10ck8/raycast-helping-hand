@@ -228,4 +228,4 @@ The Apple Intelligence helper is compiled to `assets/apple-ai`. If it's missing,
 
 ## License
 
-MIT
+[MIT](LICENSE)
