@@ -150,6 +150,6 @@ Put actions in an `ActionPanel`. The first action runs on ↵, the second on ⌘
 
 ## Limits worth remembering
 
-- No custom CSS, layout or animation. Visual tricks go through markdown images (SVG/PNG/GIF), like [src/lib/headerImage.ts](../../src/lib/headerImage.ts).
+- No custom CSS, layout or animation. Visual tricks go through markdown images (SVG/PNG/GIF), like [src/lib/header-image.ts](../../src/lib/header-image.ts).
 - `Form` is one column, and a `List` detail pane can't hold inputs.
 - The loading bar and accent colours come from the user's Raycast theme.

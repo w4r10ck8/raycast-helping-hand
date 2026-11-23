@@ -11,14 +11,16 @@ import {
   useNavigation,
 } from "@raycast/api";
 import { useLocalStorage, usePromise } from "@raycast/utils";
+import { marked } from "marked";
 import { useEffect, useRef, useState } from "react";
-import { Confirm } from "./components/Confirm";
-import { PromptForm } from "./components/PromptForm";
-import { TextForm } from "./components/TextForm";
-import { type Input, useCapturedInput } from "./hooks/useCapturedInput";
+import { AzureConnections } from "./components/azure-connections";
+import { Confirm } from "./components/confirm";
+import { PromptForm } from "./components/prompt-form";
+import { TextForm } from "./components/text-form";
+import { type Input, useCapturedInput } from "./hooks/use-captured-input";
 import { applyPrompt, mergePrompts, type SavedPrompt } from "./lib/prompt";
-import { headerImage } from "./lib/headerImage";
-import { exportPrompts, importPrompts } from "./lib/importExport";
+import { headerImage } from "./lib/header-image";
+import { exportPrompts, importPrompts } from "./lib/import-export";
 import { getProviders } from "./lib/providers";
 
 type Output = { text: string; provider: string; ms?: number; stopped?: boolean };
@@ -26,6 +28,9 @@ type Output = { text: string; provider: string; ms?: number; stopped?: boolean }
 const providers = getProviders();
 const { defaultProvider } = getPreferenceValues<{ defaultProvider?: string }>();
 const FAVOURITE_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
+
+/** HTML for rich-text apps (Teams, Outlook), raw markdown for plain-text ones (VS Code, terminal). */
+const richText = (text: string) => ({ html: marked.parse(text, { async: false }), text });
 
 function promptIcon({ icon, color }: SavedPrompt) {
   return {
@@ -172,6 +177,12 @@ export default function Command() {
           onAction={() => exportPrompts(prompts)}
         />
       )}
+      <Action.Push
+        title="Manage Azure DevOps Connections…"
+        icon={Icon.Plug}
+        shortcut={{ modifiers: ["cmd", "shift"], key: "a" }}
+        target={<AzureConnections />}
+      />
     </ActionPanel.Section>
   );
 
@@ -254,10 +265,10 @@ export default function Command() {
               {running && <Action title="Stop" icon={Icon.Stop} onAction={() => abortRef.current?.abort()} />}
               {output && (
                 <>
-                  <Action.Paste title={`Paste to ${captured.app ?? "Active App"}`} content={output.text} />
+                  <Action.Paste title={`Paste to ${captured.app ?? "Active App"}`} content={richText(output.text)} />
                   <Action.CopyToClipboard
                     title="Copy Output"
-                    content={output.text}
+                    content={richText(output.text)}
                     shortcut={{ modifiers: ["cmd"], key: "return" }}
                   />
                   <Action
@@ -409,6 +420,7 @@ export default function Command() {
                 shortcut={{ modifiers: ["cmd", "shift"], key: "i" }}
                 onAction={runImport}
               />
+              <Action.Push title="Manage Azure DevOps Connections…" icon={Icon.Plug} target={<AzureConnections />} />
             </ActionPanel>
           }
         />

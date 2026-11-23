@@ -9,7 +9,7 @@
   "commands": [
     {
       "name": "transform-text",
-      "title": "Helping Hand",
+      "title": "Prompts",
       "keywords": [
         "transform",
         "text",
@@ -17,6 +17,19 @@
         "prompt"
       ],
       "description": "Pick a prompt, transform text with Claude, Codex, Raycast AI, Ollama or Apple Intelligence",
+      "mode": "view"
+    },
+    {
+      "name": "devops-board",
+      "title": "DevOps Board",
+      "keywords": [
+        "azure",
+        "devops",
+        "boards",
+        "work item",
+        "ticket"
+      ],
+      "description": "Search Azure DevOps work items by ID, title or link",
       "mode": "view"
     }
   ],
@@ -77,7 +90,8 @@
   ],
   "dependencies": {
     "@raycast/api": "^2.11.1",
-    "@raycast/utils": "^2.3.3"
+    "@raycast/utils": "^2.3.3",
+    "marked": "^18.2.1"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^2.2.0",
@@ -92,6 +106,6 @@
     "build": "bun run build:swift && ray build -e dist",
     "dev": "bun run build:swift && ray develop",
     "lint": "ray lint",
-    "test": "node --experimental-strip-types --test src/lib/prompt.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/prompt.test.ts src/lib/azure-devops.test.ts"
   }
 }
