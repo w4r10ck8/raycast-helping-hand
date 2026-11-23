@@ -313,12 +313,16 @@ function WorkItemRow({
     <List.Item
       title={`#${item.id} · ${item.title}`}
       icon={{ source: typeBadge(item.type, colors), tooltip: `${item.type} #${item.id}` }}
-      subtitle={note ?? [item.state, item.iteration].filter(Boolean).join(" · ")}
+      subtitle={note ?? item.state}
       accessories={[
-        ...item.tags.slice(0, 2).map((tag) => ({ tag }) as List.Item.Accessory),
-        ...(item.tags.length > 2 ? [{ text: `+${item.tags.length - 2}`, tooltip: item.tags.slice(2).join(", ") }] : []),
+        ...item.tags.slice(0, 1).map((tag) => ({ tag }) as List.Item.Accessory),
+        ...(item.tags.length > 1 ? [{ text: `+${item.tags.length - 1}`, tooltip: item.tags.slice(1).join(", ") }] : []),
         ...dateAccessory(item.changedDate, "Changed"),
-        { text: item.assignedTo ?? "Unassigned", icon: Icon.Person },
+        {
+          text: item.assignedTo?.split(" ")[0] ?? "Unassigned",
+          tooltip: item.assignedTo ?? "Unassigned",
+          icon: Icon.Person,
+        },
       ]}
       actions={
         <ActionPanel>
@@ -335,6 +339,13 @@ function WorkItemRow({
             }
           />
           {workItemActions(item, connection)}
+          {item.tags.length > 0 && (
+            <ActionPanel.Submenu title="Tags" icon={Icon.Tag} shortcut={{ modifiers: ["cmd"], key: "t" }}>
+              {item.tags.map((tag) => (
+                <Action.CopyToClipboard key={tag} title={tag} content={tag} />
+              ))}
+            </ActionPanel.Submenu>
+          )}
           {extraActions}
         </ActionPanel>
       }
@@ -435,6 +446,11 @@ export default function Command() {
   );
   const workItems = (active && results?.workItems) || [];
   const pullRequests = (active && results?.pullRequests) || [];
+  const sprintName =
+    filters.sprint && workItems.every((item) => item.iteration === workItems[0]?.iteration)
+      ? workItems[0]?.iteration
+      : undefined;
+  const sectionTitle = [describeFilters(filters), sprintName].filter(Boolean).join(" · ");
 
   const manageAction = (
     <Action.Push
@@ -592,7 +608,7 @@ export default function Command() {
         </>
       ) : (
         <>
-          <List.Section title={describeFilters(filters) || undefined}>
+          <List.Section title={sectionTitle || undefined}>
             {workItems.map((item) => (
               <WorkItemRow
                 connection={connection!}
